@@ -10,6 +10,8 @@ const options = [
   { value: "noten", label: "Noten" },
 ];
 
+let defaultValues = [];
+
 export function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState(null);
@@ -48,13 +50,16 @@ export function Dashboard() {
         setAvatarUrl(data.avatar_url);
         for (var i = 0; i < data.allergies.length; i++){
           const newElement = {value: data.allergies[i].toLowerCase(), label: data.allergies[i].replace(/^\w/, (c) => c.toUpperCase())};
-          setSelectorAllergies(selectorAllergies.push(newElement));
+          defaultValues.push(newElement)
+          console.log(defaultValues)
         }
+        setSelectorAllergies(defaultValues);
       }
     } catch (error) {
       alert(error.message);
     } finally {
         setLoading(false);
+        console.log(selectorAllergies)
     }
   }
 
@@ -62,6 +67,12 @@ export function Dashboard() {
     try {
       setLoading(true);
       const user = supabase.auth.user();
+      defaultValues = [];
+      for (var i = 0; i < allergies.length; i++){
+        const newElement = {value: allergies[i].toLowerCase(), label: allergies[i].replace(/^\w/, (c) => c.toUpperCase())};
+        defaultValues.push(newElement)
+        console.log(defaultValues)
+      }
 
       const updates = {
         id: user.id,
@@ -118,9 +129,9 @@ export function Dashboard() {
       </div>
       <div>
         <label htmlFor="allergies">Allergies</label>
-        {selectorAllergies !== null &&<Select
+        {!loading && <Select
           isMulti
-          defaultValue={selectorAllergies}
+          defaultValue={defaultValues}
           onChange={(e) => setAllergyFunction(e)}
           options={options}
         />}
