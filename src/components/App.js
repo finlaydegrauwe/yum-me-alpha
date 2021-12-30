@@ -4,6 +4,7 @@ import { Dashboard } from './Dashboard'
 import { AuthProvider } from '../contexts/Auth'
 import { Login } from './Login'
 import { PrivateRoute } from './PrivateRoute'
+import './App.css';
 
 export default function App() {
   return (

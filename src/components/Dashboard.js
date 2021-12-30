@@ -118,7 +118,7 @@ export function Dashboard() {
         <label htmlFor="email">Email</label>
         <input id="email" type="text" value={user.email} disabled />
       </div> */}
-      <div>
+      <div style={{marginBottom:'1em'}} >
         <label htmlFor="username">Name</label>
         <input
           id="username"
@@ -127,7 +127,7 @@ export function Dashboard() {
           onChange={(e) => setUsername(e.target.value)}
         />
       </div>
-      <div>
+      <div style={{marginBottom:'1em'}}>
         <label htmlFor="allergies">Allergies</label>
         {!loading && <Select
           isMulti
@@ -135,7 +135,6 @@ export function Dashboard() {
           onChange={(e) => setAllergyFunction(e)}
           options={options}
         />}
-        {JSON.stringify(allergies)}
       </div>
 
       <p>
