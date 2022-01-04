@@ -4,6 +4,7 @@ import { useAuth } from "../contexts/Auth";
 import { supabase } from "../supabase";
 import Select from "react-select";
 
+
 const options = [
   { value: "gluten", label: "Gluten" },
   { value: "lactose", label: "Lactose" },
@@ -12,11 +13,13 @@ const options = [
 
 let defaultValues = [];
 
-export function Dashboard() {
+export function Dashboard(partyUrl, setPartyUrl) {
   const [loading, setLoading] = useState(true);
+  const [party, setParty] = useState(false);
+  const [partyDate, setPartyDate] = useState(false);
   const [username, setUsername] = useState(null);
   const [allergies, setAllergies] = useState(null);
-  const [selectorAllergies, setSelectorAllergies] = useState([]);
+  // const [selectorAllergies, setSelectorAllergies] = useState([]);
   const [avatar_url, setAvatarUrl] = useState(null);
   const { user, signOut } = useAuth();
   const history = useNavigate();
@@ -26,10 +29,29 @@ export function Dashboard() {
     // eslint-disable-next-line
   }, []);
 
-  // useEffect(() => {
-  //   console.log(selectorAllergies);
-  //   // eslint-disable-next-line
-  // }, [selectorAllergies]);
+  // async function sendInvitation() {
+  //   // try {
+  //   //   console.log("sending email");
+  //   //   const { data, error } = await supabase
+  //   //     .rpc('send_email_message', {
+  //   //       "sender": "finlaydegrauwe@gmail.com",
+  //   //       "recipient": "finlaydegrauwe@gmail.com",
+  //   //       "subject": "This is a test message from my Supabase app!",
+  //   //       "html_body": "<html><body>This message was sent from <a href=\"https://postgresql.org\">PostgreSQL</a> using <a href=\"https://supabase.io\">Supabase</a> and <a href=\"https://sendinblue.com\">Sendinblue</a>.</body></html>"
+  //   //     })
+
+  //   let { data, error } = await supabase.rpc("send_email_message", {
+  //     sender: "finlaydegrauwe@gmail.com",
+  //     recipient: "finlaydegrauwe@gmail.com",
+  //     subject: "This is a test message from my Supabase app!",
+  //     html_body:
+  //       '<html><body>This message was sent from <a href="https://postgresql.org">PostgreSQL</a> using <a href="https://supabase.io">Supabase</a> and <a href="https://sendinblue.com">Sendinblue</a>.</body></html>',
+  //   });
+
+  //   if (error) console.error(error);
+  //   else console.log(data);
+  //   console.log("email sent");
+  // }
 
   async function getProfile() {
     try {
@@ -48,18 +70,19 @@ export function Dashboard() {
         setUsername(data.username);
         setAllergies(data.allergies);
         setAvatarUrl(data.avatar_url);
-        for (var i = 0; i < data.allergies.length; i++){
-          const newElement = {value: data.allergies[i].toLowerCase(), label: data.allergies[i].replace(/^\w/, (c) => c.toUpperCase())};
-          defaultValues.push(newElement)
-          console.log(defaultValues)
+        for (var i = 0; i < data.allergies.length; i++) {
+          const newElement = {
+            value: data.allergies[i].toLowerCase(),
+            label: data.allergies[i].replace(/^\w/, (c) => c.toUpperCase()),
+          };
+          defaultValues.push(newElement);
         }
-        setSelectorAllergies(defaultValues);
+        // setSelectorAllergies(defaultValues);
       }
     } catch (error) {
       alert(error.message);
     } finally {
-        setLoading(false);
-        console.log(selectorAllergies)
+      setLoading(false);
     }
   }
 
@@ -68,10 +91,13 @@ export function Dashboard() {
       setLoading(true);
       const user = supabase.auth.user();
       defaultValues = [];
-      for (var i = 0; i < allergies.length; i++){
-        const newElement = {value: allergies[i].toLowerCase(), label: allergies[i].replace(/^\w/, (c) => c.toUpperCase())};
-        defaultValues.push(newElement)
-        console.log(defaultValues)
+      for (var i = 0; i < allergies.length; i++) {
+        const newElement = {
+          value: allergies[i].toLowerCase(),
+          label: allergies[i].replace(/^\w/, (c) => c.toUpperCase()),
+        };
+        defaultValues.push(newElement);
+        console.log(defaultValues);
       }
 
       const updates = {
@@ -102,9 +128,57 @@ export function Dashboard() {
     history("/login");
   }
 
-  function setAllergyFunction(e){
-      let selectedAllergies = [];
-    for (var i = 0; i < e.length; i++){
+  async function createParty(e) {
+    e.preventDefault();
+      setParty("Type a name for your party");
+    try {
+      if (party.length > 1 && partyDate) {
+        let { data, error } = await supabase
+          .from("events")
+          .insert([
+            {
+              name: party,
+              date: partyDate,
+              url:
+              party +'-'+
+              partyDate
+                .replace(/[^a-z0-9-]/gi, "_")
+                .toLowerCase()
+                .replace(/_{2,}/g, "_"),
+              guests:
+              {[username] : {name : username, allergies: allergies}}
+            },
+          ])
+          .single();
+          partyUrl.setPartyUrl(party +'-'+
+            partyDate
+              .replace(/[^a-z0-9-]/gi, "_")
+              .toLowerCase()
+              .replace(/_{2,}/g, "_"))
+      if (error) {
+        throw error;
+      } else {
+        console.log(data)
+        console.log(party + partyDate + " created in database ");
+      setParty("Creating your party");
+      history('/event/'+party +'-'+
+        partyDate
+          .replace(/[^a-z0-9-]/gi, "_")
+          .toLowerCase()
+          .replace(/_{2,}/g, "_"))
+      }
+    }
+    } catch (error) {
+      alert(error.message);
+    } finally {
+      setLoading(false);
+
+    }
+  }
+
+  function setAllergyFunction(e) {
+    let selectedAllergies = [];
+    for (var i = 0; i < e.length; i++) {
       selectedAllergies.push(e[i].label);
     }
     setAllergies(selectedAllergies);
@@ -118,7 +192,7 @@ export function Dashboard() {
         <label htmlFor="email">Email</label>
         <input id="email" type="text" value={user.email} disabled />
       </div> */}
-      <div style={{marginBottom:'1em'}} >
+      <div style={{ marginBottom: "1em" }}>
         <label htmlFor="username">Name</label>
         <input
           id="username"
@@ -127,14 +201,16 @@ export function Dashboard() {
           onChange={(e) => setUsername(e.target.value)}
         />
       </div>
-      <div style={{marginBottom:'1em'}}>
+      <div style={{ marginBottom: "1em" }}>
         <label htmlFor="allergies">Allergies</label>
-        {!loading && <Select
-          isMulti
-          defaultValue={defaultValues}
-          onChange={(e) => setAllergyFunction(e)}
-          options={options}
-        />}
+        {!loading && (
+          <Select
+            isMulti
+            defaultValue={defaultValues}
+            onChange={(e) => setAllergyFunction(e)}
+            options={options}
+          />
+        )}
       </div>
 
       <p>
@@ -148,6 +224,37 @@ export function Dashboard() {
         <span> </span>
         <button onClick={handleSignOut}>Sign out</button>
       </p>
+      <form>
+        <p>
+          {party && (
+            <>
+              <input
+                className="display-initial"
+                value={party}
+                onChange={(event) => {
+                  setParty(event.target.value);
+                }}
+                type="text"
+                autoFocus
+                onFocus={(e) => e.target.select()}
+              />
+              <input
+                className="display-initial"
+                type="date"
+                id="birthday"
+                name="birthday"
+                onChange={(event) => {
+                  setPartyDate(event.target.value);
+                }}
+              ></input>
+            </>
+          )}
+          <button onClick={createParty}>Make a new dinner party</button>
+        </p>
+      </form>
+      {/* <p>
+        <button onClick={sendInvitation}>Send email</button>
+      </p> */}
     </div>
   );
 }

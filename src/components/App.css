@@ -173,7 +173,7 @@ input[type="search"],
 input[type="tel"],
 input:not([type]) {
   display: block;
-  padding: 1rem;
+  padding: 0.5rem;
   font-size: 1rem;
   border: 2px solid var(--lighter-gray);
   color: var(--black);
@@ -182,6 +182,11 @@ input:not([type]) {
   background-color: var(--lighter-gray);
   -webkit-appearance: none;
   -moz-appearance: none;
+}
+
+.display-initial{
+  display: inline !important;
+  margin-right: 1rem;
 }
 
 select {
