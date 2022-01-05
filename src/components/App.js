@@ -15,7 +15,7 @@ export default function App() {
   return (
     <div>
       <Router>
-      <Link style={{ textDecoration: 'none', color:'white' }} to={'/'}><h1 id='title'>Yum-me</h1></Link>
+      <Link style={{ textDecoration: 'none', color:'black' }} to={'/'}><h1 id='title'>Yum-me</h1></Link>
         <AuthProvider>
           <Routes>
           <Route exact path='/' element={<PrivateRoute/>}>
