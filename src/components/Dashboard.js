@@ -140,7 +140,9 @@ export function Dashboard(partyUrl, setPartyUrl) {
               name: party,
               date: partyDate,
               url:
-              party +'-'+
+              party.replace(/[^a-z0-9-]/gi, "_")
+              .toLowerCase()
+              .replace(/_{2,}/g, "_") +'-'+
               partyDate
                 .replace(/[^a-z0-9-]/gi, "_")
                 .toLowerCase()
@@ -150,7 +152,9 @@ export function Dashboard(partyUrl, setPartyUrl) {
             },
           ])
           .single();
-          partyUrl.setPartyUrl(party +'-'+
+          partyUrl.setPartyUrl(party.replace(/[^a-z0-9-]/gi, "_")
+          .toLowerCase()
+          .replace(/_{2,}/g, "_") +'-'+
             partyDate
               .replace(/[^a-z0-9-]/gi, "_")
               .toLowerCase()
@@ -161,7 +165,9 @@ export function Dashboard(partyUrl, setPartyUrl) {
         console.log(data)
         console.log(party + partyDate + " created in database ");
       setParty("Creating your party");
-      history('/event/'+party +'-'+
+      history('/event/'+party.replace(/[^a-z0-9-]/gi, "_")
+      .toLowerCase()
+      .replace(/_{2,}/g, "_") +'-'+
         partyDate
           .replace(/[^a-z0-9-]/gi, "_")
           .toLowerCase()

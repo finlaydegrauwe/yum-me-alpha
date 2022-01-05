@@ -326,8 +326,8 @@ pre::after {
 
 ul {
   margin: 0;
-  padding: 0 1px;
-  list-style: disc outside;
+  padding: 0;
+  list-style: none;
   font-variant-numeric: tabular-nums;
 }
 
@@ -337,13 +337,19 @@ ol {
 
 ol,
 ul {
-  padding-left: 1rem;
   margin-bottom: 1rem;
 }
 
 li {
   list-style-position: inside;
+  background-color: none;
+  padding: .5rem 1rem;
+  border-radius: 1rem;
+  border: 1px solid var(--light-gray);
+  margin-bottom: .5em;
 }
+
+li:nth-child(odd) { background: var(--lighter-gray);; }
 
 kbd {
   display: inline-block;
@@ -367,6 +373,14 @@ kbd {
 abbr {
   text-decoration: none;
   border-bottom: 2px dashed #949394;
+}
+
+#addguest{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: .5em;
+  flex-wrap: wrap;
 }
 
 @media (hover: hover) {
