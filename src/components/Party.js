@@ -7,7 +7,36 @@ export default function Party() {
   const [date, setDate] = useState();
   const [description, setDescription] = useState();
   const [guests, setGuests] = useState();
+  const [addGuest, setaddGuest] = useState(false);
+  const [guestToAdd, setguestToAdd] = useState('')
   let params = useParams();
+
+  async function checkGuest() {
+    try {
+      let { data, error, status } = await supabase
+        .from("events")
+        .select(`*`)
+        .eq("url", params.eventId)
+        .single();
+      if (error && status !== 406) {
+        throw error;
+      }
+
+      if (data) {
+        console.log(data);
+        setName(data.name);
+        setDate(new Date(data.date).toDateString());
+        setDescription(data.description);
+        setGuests(data.guests);
+      } else {
+        setName("This event does not exist, go back to the home page");
+      }
+    } catch (error) {
+      alert(error.message);
+    } finally {
+      console.log(guestToAdd);
+    }
+  }
 
   useEffect(() => {
     getEvent();
@@ -95,8 +124,25 @@ export default function Party() {
       {Object.prototype.toString.call(guests) === "[object Object]" && (
         <ul>
           {Object.keys(guests).map((key) => (
-            <li key={key}>{guests[key].name+': '+guests[key].allergies.join(', ')}</li>
+            <li key={key}>
+              {guests[key].name + ": " + guests[key].allergies.join(", ")}
+            </li>
           ))}
+          <li
+            id="addguest"
+            style={{ cursor: "pointer" }}
+          >
+            {addGuest ? (
+              <>
+                <label style={{marginTop:'.3em',fontWeight:"normal"}}>Email</label>
+                <input value={guestToAdd} onChange={(event) => {setguestToAdd(event.target.value)}} style={{flexGrow:"6"}} type="email"/>
+                <button style={{flexGrow:"2"}} onClick={() => checkGuest()}>Invite guest</button>
+                <button onClick={() => setaddGuest(false)}>X</button>
+              </>
+            ) : (
+              <span style={{flexGrow:"2"}} onClick={() => setaddGuest(true)}>+ Add Guest</span>
+            )}
+          </li>
         </ul>
       )}
     </>
