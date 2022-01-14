@@ -148,7 +148,8 @@ export function Dashboard(partyUrl, setPartyUrl) {
                 .toLowerCase()
                 .replace(/_{2,}/g, "_"),
               guests:
-              {[username] : {name : username, allergies: allergies}}
+              {[username] : {name : username, allergies: allergies}},
+              creator: username
             },
           ])
           .single();
